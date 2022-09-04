@@ -5,7 +5,7 @@ using static Unity.Mathematics.math;
 
 public class Simulation : MonoBehaviour
 {
-    [SerializeField, Range(1f, 1000f)] protected float maxForce = 100f;
+    [SerializeField, Range(1f, 100000f)] protected float maxForce = 10000f;
     [SerializeField, Range(0.1f, 10f)] protected float maxSpeed = 5f;
     [SerializeField, Range(0f, 1f)] protected float friction = 0.5f;
     [SerializeField, Range(0.05f, 0.2f)] protected float collisionDistance = 0.1f;
@@ -43,10 +43,10 @@ public class Simulation : MonoBehaviour
         public float force;
     }
 
-    private Rule[,] rules;
+    public Rule[,] rules;
     private Particle[] particles;
     private Unity.Mathematics.Random rng;
-    private float4 walls = float4(-9f, +9f, -5f, +5f);
+    private float4 walls = float4(-8.5f, +8.5f, -4.75f, +4.75f);
 
     private static float2 ClampMagnitude(float2 v, float maxMagnitude)
     {
@@ -59,6 +59,7 @@ public class Simulation : MonoBehaviour
     {
         SpriteRenderer sprite = Instantiate(particleSprite_PF,
             new Vector3(position.x, position.y, 0f), Quaternion.identity);
+        sprite.transform.parent = transform;
         sprite.color = ParticleColor[(int)type];
         var particle = new Particle
         {
@@ -97,8 +98,7 @@ public class Simulation : MonoBehaviour
         Rule rule = rules[(int)p1.type, (int)p2.type];
         if (distance < rule.radius)
         {
-            float ruleForce = rule.force;
-            force += (ruleForce / distance) * direction;
+            force += (rule.force / distance) * direction;
             force = ClampMagnitude(force, maxForce);
         }
 
@@ -150,7 +150,7 @@ public class Simulation : MonoBehaviour
         }
     }
 
-    private void Start()
+    private void Awake()
     {
         int numAllParticles = numRedParticles + numGreenParticles + numBlueParticles + numYellowParticles;
         particles = new Particle[numAllParticles];
@@ -185,7 +185,10 @@ public class Simulation : MonoBehaviour
 
             },
         };
+    }
 
+    private void Start()
+    {
         int particleIndex = 0;
         CreateParticles(ParticleType.Red, numRedParticles, ref particleIndex);
         CreateParticles(ParticleType.Green, numGreenParticles, ref particleIndex);
