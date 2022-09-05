@@ -25,6 +25,17 @@ public class RulesPanel : MonoBehaviour
             }
         }
 
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            var s = FindObjectOfType<Simulation>();
+            s.RandomizeRules();
+            var rs = GetComponentsInChildren<RuleInput>();
+            foreach (var r in rs)
+            {
+                r.UpdateText();
+            }
+        }
+        
         var p = transform.localPosition;
         p.y = Mathf.MoveTowards(p.y, isOpen ? 0f : -945f, Time.unscaledDeltaTime * 3000f);
         transform.localPosition = p;

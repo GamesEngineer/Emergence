@@ -6,8 +6,8 @@ using static Unity.Mathematics.math;
 public class Simulation : MonoBehaviour
 {
     [SerializeField, Range(1f, 100000f)] protected float maxForce = 10000f;
-    [SerializeField, Range(0.1f, 10f)] protected float maxSpeed = 5f;
-    [SerializeField, Range(0f, 1f)] protected float friction = 0.5f;
+    [Range(0.1f, 10f)] public float maxSpeed = 5f;
+    [Range(0f, 60f)] public float friction = 0.5f;
     [SerializeField, Range(0.05f, 0.2f)] protected float collisionDistance = 0.1f;
     [SerializeField, Range(0f, 10000f)] protected float collisionForce = 1000f;
     [SerializeField] protected SpriteRenderer particleSprite_PF;
@@ -147,6 +147,23 @@ public class Simulation : MonoBehaviour
                 p1.netForce += ComputeForce(p1, p2);
             }
             particles[i] = p1;
+        }
+    }
+
+    public void RandomizeRules()
+    {
+        maxSpeed = rng.NextFloat(8f) + 2f;
+        friction = rng.NextFloat(60f);
+        for (int r = 0; r < 4; r++)
+        {
+            for (int c = 0; c < 4; c++)
+            {
+                rules[r, c] = new Rule
+                {
+                    radius = Mathf.Pow(rng.NextFloat(walls.y / 4f), 2f),
+                    force = Mathf.Pow(rng.NextFloat(5f), 2f) - Mathf.Pow(rng.NextFloat(5f), 2f),
+                };
+            }
         }
     }
 
