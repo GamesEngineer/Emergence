@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class RuleInput : MonoBehaviour
 {
-    public TMP_InputField forceInput;
     public TMP_InputField radiusInput;
+    public TMP_InputField forceInput;
     public Simulation sim;
     int row;
     int col;
@@ -23,8 +23,8 @@ public class RuleInput : MonoBehaviour
 
     public void UpdateText()
     {
-        radiusInput.SetTextWithoutNotify(MyRule.radius.ToString());
-        forceInput.SetTextWithoutNotify(MyRule.force.ToString());
+        radiusInput.SetTextWithoutNotify(MyRule.radius.ToString("f2"));
+        forceInput.SetTextWithoutNotify(MyRule.force.ToString("f2"));
     }
 
     Simulation.Rule MyRule

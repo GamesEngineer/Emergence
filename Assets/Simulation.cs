@@ -16,14 +16,14 @@ public class Simulation : MonoBehaviour
     [SerializeField] protected int numBlueParticles = 1000;
     [SerializeField] protected int numYellowParticles = 1000;
 
-    [SerializeField] protected Vector4 redForces = Vector4.one;
     [SerializeField] protected Vector4 redRadii = Vector4.one;
-    [SerializeField] protected Vector4 greenForces = Vector4.one;
+    [SerializeField] protected Vector4 redForces = Vector4.one;
     [SerializeField] protected Vector4 greenRadii = Vector4.one;
-    [SerializeField] protected Vector4 blueForces = Vector4.one;
+    [SerializeField] protected Vector4 greenForces = Vector4.one;
     [SerializeField] protected Vector4 blueRadii = Vector4.one;
-    [SerializeField] protected Vector4 yellowForces = Vector4.one;
+    [SerializeField] protected Vector4 blueForces = Vector4.one;
     [SerializeField] protected Vector4 yellowRadii = Vector4.one;
+    [SerializeField] protected Vector4 yellowForces = Vector4.one;
 
     public enum ParticleType { Red, Green, Blue, Yellow };
     private Color[] ParticleColor = new Color[4] { Color.red, Color.green, Color.blue, Color.yellow };

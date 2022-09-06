@@ -2233,23 +2233,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxForce: 10000
-  maxSpeed: 10
-  friction: 10
+  maxSpeed: 5
+  friction: 30
   collisionDistance: 0.0625
   collisionForce: 5000
   particleSprite_PF: {fileID: 2962979687093802709, guid: 7cb083d2d01c787498e838b1e3421aee, type: 3}
   numRedParticles: 100
   numGreenParticles: 100
-  numBlueParticles: 10
+  numBlueParticles: 8
   numYellowParticles: 100
-  redForces: {x: 2, y: 4, z: -10, w: -5}
-  redRadii: {x: 2, y: 6, z: 1, w: 0.5}
-  greenForces: {x: -2, y: 0.5, z: -5, w: 0}
-  greenRadii: {x: 0.5, y: 3, z: 1, w: 0}
-  blueForces: {x: -5, y: 1, z: -10, w: 0.1}
-  blueRadii: {x: 0.5, y: 1, z: 1, w: 10}
-  yellowForces: {x: 1, y: -1, z: -1, w: -1}
-  yellowRadii: {x: 5, y: 1, z: 0.5, w: 0.2}
+  redRadii: {x: 0.17, y: 2.72, z: 0.03, w: 3.89}
+  redForces: {x: -5.93, y: 1.03, z: -4.69, w: 0.39}
+  greenRadii: {x: 0.35, y: 0.34, z: 6, w: 4.5}
+  greenForces: {x: 9.22, y: -0.99, z: 70, w: -5.03}
+  blueRadii: {x: 1.97, y: 3.22, z: 0.85, w: 0.96}
+  blueForces: {x: 1.04, y: 0.71, z: -20, w: 0.09}
+  yellowRadii: {x: 2.53, y: 0.62, z: 0.5, w: 1.67}
+  yellowForces: {x: 10.77, y: -13.63, z: -9.34, w: -11.7}
 --- !u!4 &1817321807
 Transform:
   m_ObjectHideFlags: 0
