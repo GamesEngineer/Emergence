@@ -6,8 +6,8 @@ public class RuleInput : MonoBehaviour
     public TMP_InputField radiusInput;
     public TMP_InputField forceInput;
     public Simulation sim;
-    int row;
-    int col;
+    private int row;
+    private int col;
 
     private void Awake()
     {
@@ -21,16 +21,16 @@ public class RuleInput : MonoBehaviour
         UpdateText();
     }
 
-    public void UpdateText()
+    public Simulation.Rule Rule
     {
-        radiusInput.SetTextWithoutNotify(MyRule.radius.ToString("f2"));
-        forceInput.SetTextWithoutNotify(MyRule.force.ToString("f2"));
+        get => sim.GetRule(row, col);
+        set => sim.SetRule(row, col, value);
     }
 
-    Simulation.Rule MyRule
+    public void UpdateText()
     {
-        get => sim.rules[row, col];
-        set => sim.rules[row, col] = value;
+        radiusInput.SetTextWithoutNotify(Rule.radius.ToString("f2"));
+        forceInput.SetTextWithoutNotify(Rule.force.ToString("f2"));
     }
 
     public void CommitChanges()
@@ -45,9 +45,9 @@ public class RuleInput : MonoBehaviour
         {
             return;
         }
-        var rule = MyRule;
+        var rule = Rule;
         rule.radius = radius;
-        MyRule = rule;
+        Rule = rule;
     }
     
     public void SetForce(string value)
@@ -56,8 +56,8 @@ public class RuleInput : MonoBehaviour
         {
             return;
         }
-        var rule = MyRule;
+        var rule = Rule;
         rule.force = force;
-        MyRule = rule;
+        Rule = rule;
     }
 }
