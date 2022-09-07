@@ -2295,10 +2295,10 @@ MonoBehaviour:
   collisionDistance: 0.0625
   collisionForce: 5000
   particleSprite_PF: {fileID: 2962979687093802709, guid: 7cb083d2d01c787498e838b1e3421aee, type: 3}
-  numRedParticles: 100
-  numGreenParticles: 100
-  numBlueParticles: 8
-  numYellowParticles: 100
+  numRedParticles: 1000
+  numGreenParticles: 1000
+  numBlueParticles: 128
+  numYellowParticles: 1000
   redRadii: {x: 0.17, y: 2.72, z: 0.03, w: 3.89}
   redForces: {x: -5.93, y: 1.03, z: -4.69, w: 0.39}
   greenRadii: {x: 0.35, y: 0.34, z: 6, w: 4.5}
@@ -2307,7 +2307,7 @@ MonoBehaviour:
   blueForces: {x: 1.04, y: 0.71, z: -20, w: 0.09}
   yellowRadii: {x: 2.53, y: 0.62, z: 0.5, w: 1.67}
   yellowForces: {x: 10.77, y: -13.63, z: -9.34, w: -11.7}
-  useJobs: 0
+  useJobs: 1
 --- !u!4 &1817321807
 Transform:
   m_ObjectHideFlags: 0

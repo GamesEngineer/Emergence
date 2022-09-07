@@ -172,6 +172,7 @@ public class Simulation : MonoBehaviour
 
     #region Update particle forces with a Unity "parallel for" job
 
+    [Unity.Burst.BurstCompile(CompileSynchronously = true)]
     private struct Job_UpdateParticleNetForce : IJobParallelFor
     {
         [ReadOnly] public NativeArray<Rule> rules;
