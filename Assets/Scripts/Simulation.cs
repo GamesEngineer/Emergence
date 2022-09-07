@@ -132,12 +132,12 @@ public class Simulation : MonoBehaviour
     {
         for (int i = 0; i < particles.Length; i++)
         {
-            var particle = particles[i];
+            Particle particle = particles[i];
             particle.UpdateVelocityAndPosition(Time.deltaTime, friction, maxSpeed);
             particle.BounceOffWalls(walls, bounceVelocity: 10f);
-            particles[i] = particle; // NOTE: Particle is a value type, not a reference type, so we ahve to copy the changed object back into the array
+            particles[i] = particle; // NOTE: Particle is a value type, not a reference type, so we have to copy the changed object back into the array
 
-            var sprite = sprites[i];
+            SpriteRenderer sprite = sprites[i];
             sprite.transform.position = new Vector3(particle.position.x, particle.position.y, 0f);
         }
     }
