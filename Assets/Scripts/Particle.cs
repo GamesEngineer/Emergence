@@ -22,6 +22,7 @@ public struct Particle
     /// <returns>force vector that particle 'p2' applies to particle 'p1'</returns>
     public static float2 ComputeForce(Particle p1, Particle p2, float maxForce, float maxDistance, float collisionDistance, float collisionForce)
     {
+        collisionForce = 10f;// HACK
         float2 force = 0f;
 
         float2 delta = p1.position - p2.position;
@@ -38,7 +39,7 @@ public struct Particle
         // Apply collision force
         if (distance < collisionDistance)
         {
-            force += collisionForce * direction;
+            force += (collisionForce / collisionDistance * collisionDistance) * direction;
         }
 
         return force;

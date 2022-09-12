@@ -8,100 +8,38 @@ using static Unity.Mathematics.math;
 
 public class Simulation : MonoBehaviour
 {
-    /// <summary>
-    /// Rule defines the behavior of a specific type of Particle when in the
-    /// presence of other particles. The types of particles that are associated
-    /// with a Rule are inferred from the Rule's position (row,column) within
-    /// the rules table of the simulation. The row index represents particles
-    /// of "this" type and the column index represents particles of the "other"
-    /// type.
-    /// IMPORTANT! Rules are not usually symetric. So, rule (Red, Green) is not
-    /// usually the same as rule (Green, Red).
-    /// </summary>
-    public struct Rule
-    {
-        public float radius; // "other" particles closer than the radius will exert the rule's force on "this" particle
-        public float force; // +F is attraction, -F is repulsion
-    }
-
     #region Inspector Parameters
 
-    [Range(1f, 100000f)] public float maxForce = 10000f;
-    [Range(0.1f, 10f)] public float maxSpeed = 5f;
-    [Range(0f, 60f)] public float friction = 0.5f;
-    [Range(0.05f, 0.2f)] public float collisionDistance = 0.1f;
-    [Range(0f, 10000f)] public float collisionForce = 1000f;
+    public SimRules simRules;
     public SpriteRenderer particleSprite_PF;
     public int numRedParticles = 1000;
     public int numGreenParticles = 1000;
-    public int numBlueParticles = 1000;
+    public int numBlueParticles = 200;
     public int numYellowParticles = 1000;
-    public Vector4 redRadii = Vector4.one;
-    public Vector4 redForces = Vector4.one;
-    public Vector4 greenRadii = Vector4.one;
-    public Vector4 greenForces = Vector4.one;
-    public Vector4 blueRadii = Vector4.one;
-    public Vector4 blueForces = Vector4.one;
-    public Vector4 yellowRadii = Vector4.one;
-    public Vector4 yellowForces = Vector4.one;
 
     [Tooltip("False = use one CPU thread to update the simulation\nTrue = partition the work across multiple Job threads which run concurrently")]
     public bool useJobs;
 
     #endregion
 
+    private NativeArray<Rule> rules;
     private NativeList<Particle> particles;
     private List<SpriteRenderer> sprites;
     private Unity.Mathematics.Random rng;
     private float4 walls = float4(-8.5f, +8.5f, -4.75f, +4.75f);
+    private bool isRuleTableChanged;
 
-    #region Particle Rules
-
-    public NativeArray<Rule> rules;
-    public static int GetRuleIndex(int row, int col) => row * 4 + col;
-    public Rule GetRule(int row, int col) => rules[GetRuleIndex(row, col)];
-    public void SetRule(int row, int col, Rule rule) => rules[GetRuleIndex(row, col)] = rule;
+    public Rule GetRule(int row, int col) => simRules.GetRule(row, col);
+    public void SetRule(int row, int col, Rule rule) 
+    {
+        simRules.SetRule(row, col, rule);
+        isRuleTableChanged = true;
+    }
     public void RandomizeRules()
     {
-        maxSpeed = rng.NextFloat(8f) + 2f;
-        friction = rng.NextFloat(60f);
-        for (int row = 0; row < 4; row++)
-        {
-            for (int col = 0; col < 4; col++)
-            {
-                int ruleIndex = GetRuleIndex(row, col);
-                rules[ruleIndex] = new Rule
-                {
-                    radius = Mathf.Pow(rng.NextFloat(walls.y / 4f), 2f),
-                    force = Mathf.Pow(rng.NextFloat(5f), 2f) - Mathf.Pow(rng.NextFloat(5f), 2f),
-                };
-            }
-        }
+        simRules.RandomizeRules(ref rng, walls);
+        isRuleTableChanged = true;
     }
-    public void CopyRulesFromInspector()
-    {
-        rules[0] = new Rule { radius = redRadii.x, force = redForces.x };
-        rules[1] = new Rule { radius = redRadii.y, force = redForces.y };
-        rules[2] = new Rule { radius = redRadii.z, force = redForces.z };
-        rules[3] = new Rule { radius = redRadii.w, force = redForces.w };
-
-        rules[4] = new Rule { radius = greenRadii.x, force = greenForces.x };
-        rules[5] = new Rule { radius = greenRadii.y, force = greenForces.y };
-        rules[6] = new Rule { radius = greenRadii.z, force = greenForces.z };
-        rules[7] = new Rule { radius = greenRadii.w, force = greenForces.w };
-
-        rules[8] = new Rule { radius = blueRadii.x, force = blueForces.x };
-        rules[9] = new Rule { radius = blueRadii.y, force = blueForces.y };
-        rules[10] = new Rule { radius = blueRadii.z, force = blueForces.z };
-        rules[11] = new Rule { radius = blueRadii.w, force = blueForces.w };
-
-        rules[12] = new Rule { radius = yellowRadii.x, force = yellowForces.x };
-        rules[13] = new Rule { radius = yellowRadii.y, force = yellowForces.y };
-        rules[14] = new Rule { radius = yellowRadii.z, force = yellowForces.z };
-        rules[15] = new Rule { radius = yellowRadii.w, force = yellowForces.w };
-    }
-
-    #endregion
 
     private void AddParticles(Particle.Type type, int count)
     {
@@ -133,8 +71,8 @@ public class Simulation : MonoBehaviour
         for (int i = 0; i < particles.Length; i++)
         {
             Particle particle = particles[i];
-            particle.UpdateVelocityAndPosition(Time.deltaTime, friction, maxSpeed);
-            particle.BounceOffWalls(walls, bounceVelocity: 10f);
+            particle.UpdateVelocityAndPosition(Time.deltaTime, simRules.friction, simRules.maxSpeed);
+            particle.BounceOffWalls(walls, bounceVelocity: 0f);
             particles[i] = particle; // NOTE: Particle is a value type, not a reference type, so we have to copy the changed object back into the array
 
             SpriteRenderer sprite = sprites[i];
@@ -152,11 +90,10 @@ public class Simulation : MonoBehaviour
         {
             if (particleIndex == neighborIndex) continue; // a particle ignores itself
             var p2 = particles[neighborIndex];
-            int ruleIndex = GetRuleIndex((int)p1.type, (int)p2.type);
-            Rule rule = rules[ruleIndex];
-            p1.netForce += Particle.ComputeForce(p1, p2, rule.force, rule.radius, collisionDistance, collisionForce);
+            Rule rule = simRules.GetRule((int)p1.type, (int)p2.type);
+            p1.netForce += Particle.ComputeForce(p1, p2, rule.force, rule.radius, SimRules.collisionDistance, SimRules.maxForce);
         }
-        p1.netForce = Particle.ClampMagnitude(p1.netForce, maxForce);
+        p1.netForce = Particle.ClampMagnitude(p1.netForce, SimRules.maxForce);
         particles[particleIndex] = p1;
     }
 
@@ -180,7 +117,6 @@ public class Simulation : MonoBehaviour
         [WriteOnly] public NativeArray<Particle> particlesOut;
         public float maxForce;
         public float collisionDistance;
-        public float collisionForce;
 
         public void Execute(int particleIndex)
         {
@@ -191,9 +127,9 @@ public class Simulation : MonoBehaviour
             {
                 if (particleIndex == j) continue;
                 var p2 = particlesIn[j];
-                int ruleIndex = GetRuleIndex((int)p1.type, (int)p2.type);
+                int ruleIndex = SimRules.GetRuleIndex((int)p1.type, (int)p2.type); // NOTE: we cannot use simRules.GetRule(r,c) because simRules is a ref-type
                 Rule rule = rules[ruleIndex];
-                p1.netForce += Particle.ComputeForce(p1, p2, rule.force, rule.radius, collisionDistance, collisionForce);
+                p1.netForce += Particle.ComputeForce(p1, p2, rule.force, rule.radius, collisionDistance, maxForce);
             }
             p1.netForce = Particle.ClampMagnitude(p1.netForce, maxForce);
             particlesOut[particleIndex] = p1;
@@ -208,9 +144,8 @@ public class Simulation : MonoBehaviour
             particlesIn = particlesCopy,
             particlesOut = particles,
             rules = rules,
-            maxForce = maxForce,
-            collisionDistance = collisionDistance,
-            collisionForce = collisionForce
+            maxForce = SimRules.maxForce,
+            collisionDistance = SimRules.collisionDistance,
         };
         var computeForces_jobHandle = computeForces_Job.Schedule(particles.Length, innerloopBatchCount: 10);
         // NOTE! Other work could be done here while we wait for the jobs to finish their work
@@ -229,7 +164,7 @@ public class Simulation : MonoBehaviour
         sprites = new List<SpriteRenderer>(numAllParticles);
         rng = new Unity.Mathematics.Random((uint)DateTime.Now.Ticks);
         rules = new NativeArray<Rule>(4 * 4, Allocator.Persistent);
-        CopyRulesFromInspector();
+        isRuleTableChanged = true;
     }
 
     private void Start()
@@ -249,6 +184,12 @@ public class Simulation : MonoBehaviour
     
     void Update()
     {
+        if (isRuleTableChanged)
+        {
+            simRules.CopyRulesTableToNativeArray(rules);
+            isRuleTableChanged = false;
+        }
+
         if (useJobs)
         {
             UpdateAllParticleForcesViaJobs();

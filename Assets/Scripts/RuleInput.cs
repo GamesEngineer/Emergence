@@ -9,11 +9,6 @@ public class RuleInput : MonoBehaviour
     private int row;
     private int col;
 
-    private void Awake()
-    {
-        sim = FindObjectOfType<Simulation>();
-    }
-
     private void Start()
     {
         row = transform.GetSiblingIndex() / 4;
@@ -21,7 +16,7 @@ public class RuleInput : MonoBehaviour
         UpdateText();
     }
 
-    public Simulation.Rule Rule
+    public Rule Rule
     {
         get => sim.GetRule(row, col);
         set => sim.SetRule(row, col, value);
