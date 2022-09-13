@@ -5597,9 +5597,10 @@ MonoBehaviour:
   simRules: {fileID: 11400000, guid: 081320e3a00027d4190f3518f2dac940, type: 2}
   particleSprite_PF: {fileID: 2962979687093802709, guid: 7cb083d2d01c787498e838b1e3421aee, type: 3}
   numRedParticles: 500
-  numGreenParticles: 500
+  numGreenParticles: 1000
   numBlueParticles: 500
-  numYellowParticles: 500
+  numYellowParticles: 1000
+  bounceVelocity: 10
   useJobs: 1
   jobBatchCount: 10
 --- !u!4 &1817321807
