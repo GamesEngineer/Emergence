@@ -5,50 +5,77 @@ using UnityEngine.UI;
 public class RulesPanel : MonoBehaviour
 {
     public Simulation simulation;
-    private bool isPanelOpen = true;
 
+    #region MaxSpeed
     public TMP_InputField maxSpeed_InputField;
     public Slider maxSpeed_Slider;
 
+    public void MaxSpeedUpdated()
+    {
+        maxSpeed_InputField.text = MaxSpeed_AsString;
+        maxSpeed_Slider.value = MaxSpeed;
+    }
+
+    public float MaxSpeed 
+    {
+        get => simulation.simRules.maxSpeed;
+        set
+        {
+            if (simulation.simRules.maxSpeed == value) return;
+            simulation.simRules.maxSpeed = value;
+            MaxSpeedUpdated();
+        }
+    }
+
+    public string MaxSpeed_AsString
+    {
+        get => simulation.simRules.maxSpeed.ToString("f2");
+        set
+        {
+            if (!float.TryParse(value, out float newValue)) return;
+            MaxSpeed = newValue;
+        }
+    }
+    #endregion
+
+    #region Friction
     public TMP_InputField friction_InputField;
     public Slider friction_Slider;
 
-    public string MaxSpeed 
+    public void FrictionUpdated()
     {
-        get => simulation.simRules.maxSpeed.ToString("f2");
-        set => simulation.simRules.maxSpeed = float.Parse(value);
+        friction_InputField.text = Friction_AsString;
+        friction_Slider.value = Friction;
     }
-    public float MaxSpeed_f 
-    {
-        get => simulation.simRules.maxSpeed;
-        set => simulation.simRules.maxSpeed = value;
-    }
-    
-    public string Friction 
-    {
-        get => simulation.simRules.friction.ToString("f2");
-        set => simulation.simRules.friction = float.Parse(value);
-    }
-    public float Friction_f 
+
+    public float Friction
     {
         get => simulation.simRules.friction;
-        set => simulation.simRules.friction = value;
+        set
+        {
+            if (simulation.simRules.friction == value) return;
+            simulation.simRules.friction = value;
+            FrictionUpdated();
+        }
     }
-    public void UpdateMaxSpeed()
+    
+    public string Friction_AsString 
     {
-        maxSpeed_InputField.text = MaxSpeed;
-        maxSpeed_Slider.value = MaxSpeed_f;
+        get => simulation.simRules.friction.ToString("f3");
+        set
+        {
+            if (!float.TryParse(value, out float newValue)) return;
+            simulation.simRules.friction = newValue;
+        }
     }
-    public void UpdateFriction()
-    {
-        friction_InputField.text = Friction;
-        friction_Slider.value = Friction_f;
-    }
+    #endregion
+
+    private bool isPanelOpen = true;
 
     private void Start()
     {
-        UpdateMaxSpeed();
-        UpdateFriction();
+        MaxSpeedUpdated();
+        FrictionUpdated();
         SetPanelState(isPanelOpen);
     }
 
@@ -74,15 +101,15 @@ public class RulesPanel : MonoBehaviour
         // Slide the panel up/down in response to its open/closed state
         var pos = transform.localPosition;
         var rect = transform.GetComponent<RectTransform>();
-        pos.y = Mathf.MoveTowards(pos.y, isPanelOpen ? 0f : Screen.height/2 + rect.sizeDelta.y/2 - 60f, Time.unscaledDeltaTime * 3000f);
+        pos.y = Mathf.MoveTowards(pos.y, isPanelOpen ? 0f : Screen.height/2 + rect.sizeDelta.y/2 - 40f, Time.unscaledDeltaTime * 3000f);
         transform.localPosition = pos;
     }
 
     private void RandomizeRules()
     {
         simulation.RandomizeRules();
-        UpdateMaxSpeed();
-        UpdateFriction();
+        MaxSpeedUpdated();
+        FrictionUpdated();
         UpdateRulesTable();
     }
 

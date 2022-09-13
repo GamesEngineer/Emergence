@@ -11,8 +11,8 @@ public class RuleInput : MonoBehaviour
 
     private void Start()
     {
-        row = transform.GetSiblingIndex() / 4;
-        col = transform.GetSiblingIndex() % 4;
+        row = (transform.GetSiblingIndex() / 5) - 1;
+        col = (transform.GetSiblingIndex() % 5) - 1;
         UpdateText();
     }
 
@@ -24,8 +24,8 @@ public class RuleInput : MonoBehaviour
 
     public void UpdateText()
     {
-        radiusInput.SetTextWithoutNotify(Rule.radius.ToString("f2"));
-        forceInput.SetTextWithoutNotify(Rule.force.ToString("f2"));
+        radiusInput.SetTextWithoutNotify(Rule.radius.ToString("f3"));
+        forceInput.SetTextWithoutNotify(Rule.force.ToString("f3"));
     }
 
     public void CommitChanges()

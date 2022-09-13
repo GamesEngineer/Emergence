@@ -12,13 +12,16 @@ public class Simulation : MonoBehaviour
 
     public SimRules simRules;
     public SpriteRenderer particleSprite_PF;
-    public int numRedParticles = 1000;
-    public int numGreenParticles = 1000;
-    public int numBlueParticles = 200;
-    public int numYellowParticles = 1000;
+    public int numRedParticles = 100;
+    public int numGreenParticles = 100;
+    public int numBlueParticles = 100;
+    public int numYellowParticles = 100;
+    [Range(0f, 100f)] public float bounceVelocity = 10f;
 
     [Tooltip("False = use one CPU thread to update the simulation\nTrue = partition the work across multiple Job threads which run concurrently")]
     public bool useJobs;
+
+    [Range(1, 1000)] public int jobBatchCount = 10;
 
     #endregion
 
@@ -59,7 +62,9 @@ public class Simulation : MonoBehaviour
             };
             particles.Add(particle);
 
-            SpriteRenderer sprite = Instantiate(particleSprite_PF, new Vector3(position.x, position.y, 0f), Quaternion.identity);
+            SpriteRenderer sprite = Instantiate(particleSprite_PF,
+                new Vector3(position.x, position.y, 0f),
+                Quaternion.identity);
             sprite.transform.parent = transform;
             sprite.color = particle.color;
             sprites.Add(sprite);
@@ -72,7 +77,7 @@ public class Simulation : MonoBehaviour
         {
             Particle particle = particles[i];
             particle.UpdateVelocityAndPosition(Time.deltaTime, simRules.friction, simRules.maxSpeed);
-            particle.BounceOffWalls(walls, bounceVelocity: 0f);
+            particle.BounceOffWalls(walls, bounceVelocity);
             particles[i] = particle; // NOTE: Particle is a value type, not a reference type, so we have to copy the changed object back into the array
 
             SpriteRenderer sprite = sprites[i];
@@ -91,9 +96,9 @@ public class Simulation : MonoBehaviour
             if (particleIndex == neighborIndex) continue; // a particle ignores itself
             var p2 = particles[neighborIndex];
             Rule rule = simRules.GetRule((int)p1.type, (int)p2.type);
-            p1.netForce += Particle.ComputeForce(p1, p2, rule.force, rule.radius, SimRules.collisionDistance, SimRules.maxForce);
+            p1.netForce += Particle.ComputeForce(p1, p2, rule.force, rule.radius, SimRules.COLLISION_DISTANCE, SimRules.MAX_FORCE);
         }
-        p1.netForce = Particle.ClampMagnitude(p1.netForce, SimRules.maxForce);
+        p1.netForce = Particle.ClampMagnitude(p1.netForce, SimRules.MAX_FORCE);
         particles[particleIndex] = p1;
     }
 
@@ -144,10 +149,10 @@ public class Simulation : MonoBehaviour
             particlesIn = particlesCopy,
             particlesOut = particles,
             rules = rules,
-            maxForce = SimRules.maxForce,
-            collisionDistance = SimRules.collisionDistance,
+            maxForce = SimRules.MAX_FORCE,
+            collisionDistance = SimRules.COLLISION_DISTANCE,
         };
-        var computeForces_jobHandle = computeForces_Job.Schedule(particles.Length, innerloopBatchCount: 10);
+        var computeForces_jobHandle = computeForces_Job.Schedule(particles.Length, jobBatchCount);
         // NOTE! Other work could be done here while we wait for the jobs to finish their work
         computeForces_jobHandle.Complete();
         particlesCopy.Dispose();

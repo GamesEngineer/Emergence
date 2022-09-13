@@ -22,12 +22,11 @@ public struct Particle
     /// <returns>force vector that particle 'p2' applies to particle 'p1'</returns>
     public static float2 ComputeForce(Particle p1, Particle p2, float maxForce, float maxDistance, float collisionDistance, float collisionForce)
     {
-        collisionForce = 10f;// HACK
         float2 force = 0f;
 
         float2 delta = p1.position - p2.position;
         float distance = length(delta);
-        distance = max(1e-8f, distance); // prevent divide by zero
+        distance = max(1e-14f, distance); // prevent divide by zero
         float2 direction = delta / distance;
 
         // Apply distance-based force
@@ -39,7 +38,7 @@ public struct Particle
         // Apply collision force
         if (distance < collisionDistance)
         {
-            force += (collisionForce / collisionDistance * collisionDistance) * direction;
+            force += collisionForce * direction;
         }
 
         return force;
@@ -49,7 +48,7 @@ public struct Particle
     {
         velocity *= Mathf.Clamp01(1f - friction * deltaTime); // friction
         velocity += netForce * deltaTime; // acceleration (particle mass is one unit, so F = mA becomes F = A)
-        velocity = ClampMagnitude(velocity, maxSpeed);
+        velocity = ClampMagnitude(velocity, maxSpeed * deltaTime * 100f);
         position += velocity * deltaTime; // translation
     }
 

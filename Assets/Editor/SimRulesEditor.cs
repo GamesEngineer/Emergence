@@ -62,7 +62,6 @@ public class SimRulesEditor : Editor
             Undo.RecordObject(rules, "Randomize Rules");            
             rng = new Unity.Mathematics.Random((uint)DateTime.Now.Ticks);
             rules.RandomizeRules(ref rng, walls);
-            PrefabUtility.RecordPrefabInstancePropertyModifications(rules);
         }
     }
 }

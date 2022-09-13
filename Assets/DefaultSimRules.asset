@@ -12,8 +12,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a6b1af18bed9ad408eb282f5b4c1e1d, type: 3}
   m_Name: DefaultSimRules
   m_EditorClassIdentifier: 
-  maxForce: 10000
-  maxSpeed: 2.647
-  friction: 24.175
-  collisionDistance: 0.1
-  collisionForce: 1000
+  maxSpeed: 1
+  friction: 0.7
+  rulesTable:
+  - radius: 2
+    force: -0.1
+  - radius: 1
+    force: 0.2
+  - radius: 4
+    force: 0.8
+  - radius: 0
+    force: 0
+  - radius: 0.6
+    force: -9.66
+  - radius: 0.9
+    force: -7.69
+  - radius: 0.35
+    force: 2.65
+  - radius: 1
+    force: 6
+  - radius: 3
+    force: 20
+  - radius: 0.2
+    force: 60
+  - radius: 0.2
+    force: -1000
+  - radius: 1
+    force: 40
+  - radius: 0.1
+    force: 3
+  - radius: 3.28
+    force: 15.9
+  - radius: 1
+    force: 4
+  - radius: 2.79
+    force: -19
