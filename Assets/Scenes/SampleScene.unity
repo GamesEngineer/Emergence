@@ -5600,7 +5600,6 @@ MonoBehaviour:
   numGreenParticles: 1000
   numBlueParticles: 500
   numYellowParticles: 1000
-  bounceVelocity: 10
   useJobs: 1
   jobBatchCount: 10
 --- !u!4 &1817321807
