@@ -16,7 +16,7 @@ public struct Particle
     public static float2 ClampMagnitude(float2 v, float maxMagnitude)
     {
         float magnitude = length(v);
-        return (magnitude <= maxMagnitude) ? v : (v / magnitude);
+        return (magnitude <= maxMagnitude) ? v : (v * (maxMagnitude / magnitude));
     }
 
     /// <returns>force vector that particle 'p2' applies to particle 'p1'</returns>
@@ -52,11 +52,11 @@ public struct Particle
         position += velocity * deltaTime; // translation
     }
 
-    public void BounceOffWalls(float4 walls, float bounceVelocity)
+    public void BounceOffWalls(float4 walls)
     {
-        if (position.x < walls.x) { position.x = walls.x; velocity.x = +bounceVelocity - velocity.x; }
-        if (position.x > walls.y) { position.x = walls.y; velocity.x = -bounceVelocity - velocity.x; }
-        if (position.y < walls.z) { position.y = walls.z; velocity.y = +bounceVelocity - velocity.y; }
-        if (position.y > walls.w) { position.y = walls.w; velocity.y = -bounceVelocity - velocity.y; }
+        if (position.x < walls.x) { position.x = walls.x; velocity.x = -velocity.x; }
+        if (position.x > walls.y) { position.x = walls.y; velocity.x = -velocity.x; }
+        if (position.y < walls.z) { position.y = walls.z; velocity.y = -velocity.y; }
+        if (position.y > walls.w) { position.y = walls.w; velocity.y = -velocity.y; }
     }
 }

@@ -16,7 +16,6 @@ public class Simulation : MonoBehaviour
     public int numGreenParticles = 100;
     public int numBlueParticles = 100;
     public int numYellowParticles = 100;
-    [Range(0f, 100f)] public float bounceVelocity = 10f;
 
     [Tooltip("False = use one CPU thread to update the simulation\nTrue = partition the work across multiple Job threads which run concurrently")]
     public bool useJobs;
@@ -77,7 +76,7 @@ public class Simulation : MonoBehaviour
         {
             Particle particle = particles[i];
             particle.UpdateVelocityAndPosition(Time.deltaTime, simRules.friction, simRules.maxSpeed);
-            particle.BounceOffWalls(walls, bounceVelocity);
+            particle.BounceOffWalls(walls);
             particles[i] = particle; // NOTE: Particle is a value type, not a reference type, so we have to copy the changed object back into the array
 
             SpriteRenderer sprite = sprites[i];
@@ -158,9 +157,9 @@ public class Simulation : MonoBehaviour
         particlesCopy.Dispose();
     }
 
-    #endregion
+#endregion
 
-    #region Unity Messages
+#region Unity Messages
 
     private void Awake()
     {
@@ -207,5 +206,5 @@ public class Simulation : MonoBehaviour
         UpdateAllParticlePositions();
     }
 
-    #endregion
+#endregion
 }
